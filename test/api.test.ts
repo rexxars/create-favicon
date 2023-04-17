@@ -1,5 +1,5 @@
 import {createReadStream, existsSync} from 'node:fs'
-import {stat, readFile, mkdir, rm} from 'node:fs/promises'
+import {stat, readFile, mkdir, rm, copyFile} from 'node:fs/promises'
 import {join as joinPath} from 'node:path'
 import {tmpdir} from 'node:os'
 import {createHash} from 'node:crypto'
@@ -244,6 +244,77 @@ describe('api', () => {
         ],
       }
     `)
+  })
+
+  test('should skip existing files by default', async () => {
+    const warn = vi.fn()
+    const outputDir = getTmpDir('existing')
+    const sourceFile = joinPath(fixturesPath, 'mead.svg')
+
+    // Place copies of _some_ file for all the below files, just to have something to
+    // check whether or not gets overwritten later down
+    const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
+    const doNotReplaceHash = await hashFile(doNotReplaceFile)
+    const targetFiles = [
+      'icon-512.png',
+      'icon-192.png',
+      'apple-touch-icon.png',
+      'favicon.ico',
+      'manifest.webmanifest',
+      'icon.svg',
+    ]
+
+    await mkdir(outputDir, {recursive: true})
+    await Promise.all(
+      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
+    )
+
+    await createFavicon({
+      sourceFile,
+      outputDir,
+      warn,
+    })
+
+    for (const target of targetFiles) {
+      expect(await hashFile(joinPath(outputDir, target))).toBe(doNotReplaceHash)
+      expect(warn).toHaveBeenCalledWith(`File ${target} already exists - skipping`)
+    }
+  })
+
+  test('should replace existing files with `overwrite: true`', async () => {
+    const warn = vi.fn()
+    const outputDir = getTmpDir('overwrite')
+    const sourceFile = joinPath(fixturesPath, 'mead.svg')
+
+    // Place copies of _some_ file for all the below files, just to have something to
+    // check whether or not gets overwritten later down
+    const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
+    const doNotReplaceHash = await hashFile(doNotReplaceFile)
+    const targetFiles = [
+      'icon-512.png',
+      'icon-192.png',
+      'apple-touch-icon.png',
+      'favicon.ico',
+      'manifest.webmanifest',
+      'icon.svg',
+    ]
+
+    await mkdir(outputDir, {recursive: true})
+    await Promise.all(
+      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
+    )
+
+    await createFavicon({
+      overwrite: true,
+      sourceFile,
+      outputDir,
+      warn,
+    })
+
+    for (const target of targetFiles) {
+      expect(await hashFile(joinPath(outputDir, target))).not.toBe(doNotReplaceHash)
+      expect(warn).toHaveBeenCalledWith(`File ${target} already exists - replacing`)
+    }
   })
 
   test('should generate all variations from valid SVG (over HTTP)', async () => {

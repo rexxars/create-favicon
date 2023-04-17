@@ -36,6 +36,7 @@ create-favicon <path-to-image>
 ## CLI options
 
 ```
+--overwrite         Overwrite existing files (default: false)
 --output-dir <dir>  Output directory (default: <cwd>/favicons)
 --base-path <path>  Base path for printed HTML and web manifest (default: /)
 --no-warn           Disable warnings (default: false)
@@ -63,6 +64,18 @@ const {html} = await createFavicon({
 const {html} = await createFavicon({
   sourceFile: '/path/to/some/file.svg',
   basePath: '/my/app',
+})
+
+// If you want to overwrite existing files, pass the `overwrite` option:
+const {html} = await createFavicon({
+  sourceFile: '/path/to/some/file.svg',
+  overwrite: true
+})
+
+// Warnings can be silenced by passing `false` to the `warn` option:
+const {html} = await createFavicon({
+  sourceFile: '/path/to/some/file.svg',
+  warn: false
 })
 
 // The favicon generator can also take a URL as input:

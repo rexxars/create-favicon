@@ -13,7 +13,15 @@ export interface FaviconOptions {
   sourceFile: string | Buffer
 
   /**
+   * Whether or not to overwrite existing files.
+   *
+   * Defaults to `false`.
+   */
+  overwrite?: boolean
+
+  /**
    * The output directory for the generated favicons.
+   *
    * Defaults to a `favicons` folder within the current working directory.
    */
   outputDir?: string
@@ -28,6 +36,7 @@ export interface FaviconOptions {
 
   /**
    * Base path to use for printed HTML and web manifest files.
+   *
    * Defaults to `/`.
    */
   basePath?: string

@@ -1,5 +1,5 @@
-import path from 'node:path'
-import {mkdir, readFile, writeFile} from 'node:fs/promises'
+import {join as joinPath, resolve as resolvePath} from 'node:path'
+import {mkdir, stat, readFile, writeFile} from 'node:fs/promises'
 import sharp from 'sharp'
 import {request} from 'undici'
 import {sharpToIco} from './ico.js'
@@ -20,9 +20,10 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
 
   const {
     sourceFile,
-    outputDir = path.join(process.cwd(), 'favicons'),
+    outputDir = joinPath(process.cwd(), 'favicons'),
     warn = console.warn,
     basePath = '/',
+    overwrite = false,
   } = options
 
   if (!sourceFile) {
@@ -40,7 +41,7 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
   if (isUrl) {
     source = await downloadImage(sourceFile)
   } else if (!isBuffer) {
-    source = await readImage(path.resolve(process.cwd(), sourceFile))
+    source = await readImage(resolvePath(process.cwd(), sourceFile))
   }
 
   if (!source) {
@@ -74,22 +75,45 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
     base.resize(size, size, {fit: 'contain', background: 'transparent'})
   }
 
+  async function maybeWriteFile(name: string, writer: (fullPath: string) => Promise<any>) {
+    const fullPath = joinPath(outputDir, name)
+    const exists = await fileExists(fullPath)
+
+    if (exists && overwrite) {
+      printWarning(`File ${name} already exists - replacing`, warn)
+      return writer(fullPath)
+    }
+
+    if (exists && !overwrite) {
+      return printWarning(`File ${name} already exists - skipping`, warn)
+    }
+
+    return writer(fullPath)
+  }
+
   // 512x512 and 192x192 for Android devices
-  await base.clone().resize(512, 512).png().toFile(path.join(outputDir, 'icon-512.png'))
-  await base.clone().resize(192, 192).png().toFile(path.join(outputDir, 'icon-192.png'))
+  await maybeWriteFile('icon-512.png', (path) => base.clone().resize(512, 512).png().toFile(path))
+  await maybeWriteFile('icon-192.png', (path) => base.clone().resize(192, 192).png().toFile(path))
 
   // 180x180 for iOS devices
-  await base.clone().resize(180, 180).png().toFile(path.join(outputDir, 'apple-touch-icon.png'))
+  await maybeWriteFile('apple-touch-icon.png', (path) =>
+    base.clone().resize(180, 180).png().toFile(path)
+  )
 
   // 32x32 favicon for older browsers
-  await writeFile(path.join(outputDir, 'favicon.ico'), await sharpToIco(base.clone()))
+  await maybeWriteFile('favicon.ico', async (path) =>
+    writeFile(path, await sharpToIco(base.clone()))
+  )
 
   // Web manifest file pointing to the generated files
-  await writeFile(path.join(outputDir, 'manifest.webmanifest'), generateWebManifest(basePath))
+  await maybeWriteFile('manifest.webmanifest', (path) =>
+    writeFile(path, generateWebManifest(basePath))
+  )
 
   // If the input is an SVG, pass-through the original SVG as well
-  if (format === 'svg') {
-    await writeFile(path.join(outputDir, 'icon.svg'), source)
+  if (format === 'svg' && source) {
+    const inputSource = source
+    await maybeWriteFile('icon.svg', (path) => writeFile(path, inputSource))
   }
 
   // Generate the HTML needed for the `<head>` of the HTML document
@@ -178,4 +202,30 @@ function printWarning(message: string, warner: typeof console.warn | false): voi
   }
 
   warner(warner === console.warn ? `\u001b[93m[warn]\u001b[39m ${message}` : message)
+}
+
+/**
+ * Checks if a file exists or not, with a friendly error if the existing path is not a file
+ *
+ * @param filePath - File path to check
+ * @returns Promise resolving to true if it exists, false otherwise
+ */
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    const file = await stat(filePath)
+    if (!file.isFile()) {
+      throw new Error(`"${filePath}" is not a file`)
+    }
+    return true
+  } catch (err: unknown) {
+    if (!(err instanceof Error)) {
+      throw new Error(`${err}`)
+    }
+
+    if ('code' in err && err.code === 'ENOENT') {
+      return false
+    }
+
+    throw err
+  }
 }
