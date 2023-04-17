@@ -1,5 +1,5 @@
 import {createReadStream, existsSync} from 'node:fs'
-import {stat, readFile, mkdir, rmdir} from 'node:fs/promises'
+import {stat, readFile, mkdir, rm} from 'node:fs/promises'
 import {join as joinPath} from 'node:path'
 import {tmpdir} from 'node:os'
 import {createHash} from 'node:crypto'
@@ -46,7 +46,7 @@ describe('api', () => {
   })
 
   afterAll(async () => {
-    await rmdir(testOutputDir, {recursive: true})
+    await rm(testOutputDir, {recursive: true})
     await new Promise<void>((resolve, reject) => {
       server.close((err) => (err ? reject(err) : resolve()))
     })
