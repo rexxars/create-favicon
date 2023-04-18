@@ -122,7 +122,7 @@ describe('cli', () => {
     const result = createFavicon([sourceFile, outputDir])
     expect(result.status).toBe(0)
 
-    expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
+    expect(await hashFile(joinPath(outputDir, 'favicon.svg'))).toBe(await hashFile(sourceFile))
 
     expect(await sharp(joinPath(outputDir, 'apple-touch-icon.png')).metadata()).toMatchObject({
       width: 180,
@@ -131,14 +131,14 @@ describe('cli', () => {
       hasAlpha: true,
     })
 
-    expect(await sharp(joinPath(outputDir, 'icon-512.png')).metadata()).toMatchObject({
+    expect(await sharp(joinPath(outputDir, 'favicon-512.png')).metadata()).toMatchObject({
       width: 512,
       height: 512,
       format: 'png',
       hasAlpha: true,
     })
 
-    expect(await sharp(joinPath(outputDir, 'icon-192.png')).metadata()).toMatchObject({
+    expect(await sharp(joinPath(outputDir, 'favicon-192.png')).metadata()).toMatchObject({
       width: 192,
       height: 192,
       format: 'png',
@@ -154,11 +154,11 @@ describe('cli', () => {
     const sourceFile = joinPath(fixturesPath, 'mead.svg')
     const result = await createFavicon([sourceFile, outputDir])
 
-    expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
+    expect(await hashFile(joinPath(outputDir, 'favicon.svg'))).toBe(await hashFile(sourceFile))
 
     expect(result.stdout).toMatchInlineSnapshot(`
       "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/icon.svg\\" type=\\"image/svg+xml\\">
+      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
       <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
       <link rel=\\"manifest\\" href=\\"/manifest.webmanifest\\">
       "
@@ -171,14 +171,14 @@ describe('cli', () => {
       hasAlpha: true,
     })
 
-    expect(await sharp(joinPath(outputDir, 'icon-512.png')).metadata()).toMatchObject({
+    expect(await sharp(joinPath(outputDir, 'favicon-512.png')).metadata()).toMatchObject({
       width: 512,
       height: 512,
       format: 'png',
       hasAlpha: true,
     })
 
-    expect(await sharp(joinPath(outputDir, 'icon-192.png')).metadata()).toMatchObject({
+    expect(await sharp(joinPath(outputDir, 'favicon-192.png')).metadata()).toMatchObject({
       width: 192,
       height: 192,
       format: 'png',
@@ -193,12 +193,12 @@ describe('cli', () => {
       "icons": [
         {
           "sizes": "192x192",
-          "src": "/icon-192.png",
+          "src": "/favicon-192.png",
           "type": "image/png",
         },
         {
           "sizes": "512x512",
-          "src": "/icon-512.png",
+          "src": "/favicon-512.png",
           "type": "image/png",
         },
       ],
@@ -211,12 +211,12 @@ describe('cli', () => {
     const sourceFile = joinPath(fixturesPath, 'mead.svg')
     const result = await createFavicon([sourceFile, outputDir, '--no-manifest'])
 
-    expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
+    expect(await hashFile(joinPath(outputDir, 'favicon.svg'))).toBe(await hashFile(sourceFile))
     expect(existsSync(joinPath(outputDir, 'manifest.webmanifest'))).toBe(false)
 
     expect(result.stdout).toMatchInlineSnapshot(`
       "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/icon.svg\\" type=\\"image/svg+xml\\">
+      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
       <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
       "
     `)
@@ -231,12 +231,12 @@ describe('cli', () => {
     const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
     const doNotReplaceHash = await hashFile(doNotReplaceFile)
     const targetFiles = [
-      'icon-512.png',
-      'icon-192.png',
+      'favicon-512.png',
+      'favicon-192.png',
       'apple-touch-icon.png',
       'favicon.ico',
       'manifest.webmanifest',
-      'icon.svg',
+      'favicon.svg',
     ]
 
     await mkdir(outputDir, {recursive: true})
@@ -261,12 +261,12 @@ describe('cli', () => {
     const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
     const doNotReplaceHash = await hashFile(doNotReplaceFile)
     const targetFiles = [
-      'icon-512.png',
-      'icon-192.png',
+      'favicon-512.png',
+      'favicon-192.png',
       'apple-touch-icon.png',
       'favicon.ico',
       'manifest.webmanifest',
-      'icon.svg',
+      'favicon.svg',
     ]
 
     await mkdir(outputDir, {recursive: true})
@@ -290,7 +290,7 @@ describe('cli', () => {
     expect(result.stderr).toMatch(/Source image is not an SVG - skipping SVG output/i)
 
     // eslint-disable-next-line no-sync
-    expect(existsSync(joinPath(outputDir, 'icon.svg'))).toBe(false)
+    expect(existsSync(joinPath(outputDir, 'favicon.svg'))).toBe(false)
 
     expect(result.stdout).toMatchInlineSnapshot(`
       "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
@@ -306,14 +306,14 @@ describe('cli', () => {
       hasAlpha: true,
     })
 
-    expect(await sharp(joinPath(outputDir, 'icon-512.png')).metadata()).toMatchObject({
+    expect(await sharp(joinPath(outputDir, 'favicon-512.png')).metadata()).toMatchObject({
       width: 512,
       height: 512,
       format: 'png',
       hasAlpha: true,
     })
 
-    expect(await sharp(joinPath(outputDir, 'icon-192.png')).metadata()).toMatchObject({
+    expect(await sharp(joinPath(outputDir, 'favicon-192.png')).metadata()).toMatchObject({
       width: 192,
       height: 192,
       format: 'png',
@@ -328,12 +328,12 @@ describe('cli', () => {
         "icons": [
           {
             "sizes": "192x192",
-            "src": "/icon-192.png",
+            "src": "/favicon-192.png",
             "type": "image/png",
           },
           {
             "sizes": "512x512",
-            "src": "/icon-512.png",
+            "src": "/favicon-512.png",
             "type": "image/png",
           },
         ],
@@ -352,7 +352,7 @@ describe('cli', () => {
 
     expect(result.stdout).toMatchInlineSnapshot(`
       "<link rel=\\"icon\\" href=\\"/foo/bar/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/foo/bar/icon.svg\\" type=\\"image/svg+xml\\">
+      <link rel=\\"icon\\" href=\\"/foo/bar/favicon.svg\\" type=\\"image/svg+xml\\">
       <link rel=\\"apple-touch-icon\\" href=\\"/foo/bar/apple-touch-icon.png\\">
       <link rel=\\"manifest\\" href=\\"/foo/bar/manifest.webmanifest\\">
       "
@@ -364,12 +364,12 @@ describe('cli', () => {
         "icons": [
           {
             "sizes": "192x192",
-            "src": "/foo/bar/icon-192.png",
+            "src": "/foo/bar/favicon-192.png",
             "type": "image/png",
           },
           {
             "sizes": "512x512",
-            "src": "/foo/bar/icon-512.png",
+            "src": "/foo/bar/favicon-512.png",
             "type": "image/png",
           },
         ],

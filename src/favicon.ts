@@ -93,8 +93,12 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
   }
 
   // 512x512 and 192x192 for Android devices
-  await maybeWriteFile('icon-512.png', (path) => base.clone().resize(512, 512).png().toFile(path))
-  await maybeWriteFile('icon-192.png', (path) => base.clone().resize(192, 192).png().toFile(path))
+  await maybeWriteFile('favicon-512.png', (path) =>
+    base.clone().resize(512, 512).png().toFile(path)
+  )
+  await maybeWriteFile('favicon-192.png', (path) =>
+    base.clone().resize(192, 192).png().toFile(path)
+  )
 
   // 180x180 for iOS devices
   await maybeWriteFile('apple-touch-icon.png', (path) =>
@@ -116,7 +120,7 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
   // If the input is an SVG, pass-through the original SVG as well
   if (format === 'svg' && source) {
     const inputSource = source
-    await maybeWriteFile('icon.svg', (path) => writeFile(path, inputSource))
+    await maybeWriteFile('favicon.svg', (path) => writeFile(path, inputSource))
   }
 
   // Generate the HTML needed for the `<head>` of the HTML document
@@ -139,7 +143,7 @@ function generateHtml(options: {basePath: string; hasSvg: boolean; manifest: boo
   const links = [`<link rel="icon" href="${base}/favicon.ico" sizes="any">`]
 
   if (hasSvg) {
-    links.push(`<link rel="icon" href="${base}/icon.svg" type="image/svg+xml">`)
+    links.push(`<link rel="icon" href="${base}/favicon.svg" type="image/svg+xml">`)
   }
 
   links.push(`<link rel="apple-touch-icon" href="${base}/apple-touch-icon.png">`)

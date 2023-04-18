@@ -9,8 +9,8 @@ export function generateWebManifest(basePath: string = '/'): string {
   const base = basePath.endsWith('/') ? basePath.replace(/\/+$/, '') : basePath
   const manifest = {
     icons: [
-      {src: `${base}/icon-192.png`, type: 'image/png', sizes: '192x192'},
-      {src: `${base}/icon-512.png`, type: 'image/png', sizes: '512x512'},
+      {src: `${base}/favicon-192.png`, type: 'image/png', sizes: '192x192'},
+      {src: `${base}/favicon-512.png`, type: 'image/png', sizes: '512x512'},
     ],
   }
   return JSON.stringify(manifest, null, 2)
