@@ -20,6 +20,13 @@ export interface FaviconOptions {
   overwrite?: boolean
 
   /**
+   * Whether or not to output a web manifest file.
+   *
+   * Defaults to `true`.
+   */
+  manifest?: boolean
+
+  /**
    * The output directory for the generated favicons.
    *
    * Defaults to a `favicons` folder within the current working directory.

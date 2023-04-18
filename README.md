@@ -44,6 +44,7 @@ npx create-favicon <path-to-image> [output-dir] -- --no-warn
 --overwrite         Overwrite existing files (default: false)
 --base-path <path>  Base path for printed HTML and web manifest (default: /)
 --no-warn           Disable warnings (default: false)
+--no-manifest       Skip outputting a webmanifest (default: false)
 -h, --help          Display this message
 -v, --version       Display version number
 ```
@@ -80,6 +81,12 @@ const {html} = await createFavicon({
 const {html} = await createFavicon({
   sourceFile: '/path/to/some/file.svg',
   warn: false,
+})
+
+// Manifest generation can be disabled:
+const {html} = await createFavicon({
+  sourceFile: '/path/to/some/file.svg',
+  manifest: false,
 })
 
 // The favicon generator can also take a URL as input:

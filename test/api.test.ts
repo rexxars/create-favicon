@@ -246,6 +246,25 @@ describe('api', () => {
     `)
   })
 
+  test('should skip writing webmanifest if `manifest` is set to `false`', async () => {
+    const outputDir = getTmpDir('nomanifest')
+    const sourceFile = joinPath(fixturesPath, 'mead.svg')
+    const result = await createFavicon({
+      sourceFile,
+      outputDir,
+      manifest: false,
+    })
+
+    expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
+    expect(existsSync(joinPath(outputDir, 'manifest.webmanifest'))).toBe(false)
+
+    expect(result.html).toMatchInlineSnapshot(`
+      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
+      <link rel=\\"icon\\" href=\\"/icon.svg\\" type=\\"image/svg+xml\\">
+      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">"
+    `)
+  })
+
   test('should skip existing files by default', async () => {
     const warn = vi.fn()
     const outputDir = getTmpDir('existing')

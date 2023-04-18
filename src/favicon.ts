@@ -24,6 +24,7 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
     warn = console.warn,
     basePath = '/',
     overwrite = false,
+    manifest = true,
   } = options
 
   if (!sourceFile) {
@@ -106,9 +107,11 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
   )
 
   // Web manifest file pointing to the generated files
-  await maybeWriteFile('manifest.webmanifest', (path) =>
-    writeFile(path, generateWebManifest(basePath))
-  )
+  if (manifest) {
+    await maybeWriteFile('manifest.webmanifest', (path) =>
+      writeFile(path, generateWebManifest(basePath))
+    )
+  }
 
   // If the input is an SVG, pass-through the original SVG as well
   if (format === 'svg' && source) {
@@ -117,7 +120,7 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
   }
 
   // Generate the HTML needed for the `<head>` of the HTML document
-  const html = generateHtml({basePath, hasSvg: format === 'svg'})
+  const html = generateHtml({basePath, hasSvg: format === 'svg', manifest})
 
   return {html}
 }
@@ -129,8 +132,8 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
  * @returns The `<link>` tags required, unindented and separated by newlines
  * @internal
  */
-function generateHtml(options: {basePath: string; hasSvg: boolean}): string {
-  const {basePath, hasSvg} = options
+function generateHtml(options: {basePath: string; hasSvg: boolean; manifest: boolean}): string {
+  const {basePath, hasSvg, manifest} = options
   const base = basePath.endsWith('/') ? basePath.replace(/\/+$/, '') : basePath
 
   const links = [`<link rel="icon" href="${base}/favicon.ico" sizes="any">`]
@@ -139,10 +142,11 @@ function generateHtml(options: {basePath: string; hasSvg: boolean}): string {
     links.push(`<link rel="icon" href="${base}/icon.svg" type="image/svg+xml">`)
   }
 
-  links.push(
-    `<link rel="apple-touch-icon" href="${base}/apple-touch-icon.png">`,
-    `<link rel="manifest" href="${base}/manifest.webmanifest">`
-  )
+  links.push(`<link rel="apple-touch-icon" href="${base}/apple-touch-icon.png">`)
+
+  if (manifest) {
+    links.push(`<link rel="manifest" href="${base}/manifest.webmanifest">`)
+  }
 
   return links.join('\n')
 }

@@ -12,12 +12,13 @@ cli
   })
   .option('--overwrite', 'Overwrite existing files', {default: false})
   .option('--base-path <path>', 'Base path for printed HTML and web manifest', {default: '/'})
+  .option('--no-manifest', 'Skip outputting a webmanifest', {default: false})
   .option('--no-warn', 'Disable warnings', {default: false})
   .example((name) => `${name} source.svg`)
   .example((name) => `${name} https://example.com/source.png --output-dir icons`)
   .action(async (sourceFile, outputDir, flags) => {
-    const {basePath, warn, overwrite} = flags
-    const options = {sourceFile, outputDir, basePath, warn, overwrite}
+    const {basePath, warn, overwrite, manifest} = flags
+    const options = {sourceFile, outputDir, basePath, warn, overwrite, manifest}
 
     try {
       const result = await createFavicon(options)

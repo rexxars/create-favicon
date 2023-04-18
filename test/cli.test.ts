@@ -206,6 +206,22 @@ describe('cli', () => {
     `)
   })
 
+  test('should skip writing webmanifest if `manifest` is set to `false`', async () => {
+    const outputDir = getTmpDir('nomanifest')
+    const sourceFile = joinPath(fixturesPath, 'mead.svg')
+    const result = await createFavicon([sourceFile, outputDir, '--no-manifest'])
+
+    expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
+    expect(existsSync(joinPath(outputDir, 'manifest.webmanifest'))).toBe(false)
+
+    expect(result.stdout).toMatchInlineSnapshot(`
+      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
+      <link rel=\\"icon\\" href=\\"/icon.svg\\" type=\\"image/svg+xml\\">
+      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
+      "
+    `)
+  })
+
   test('should skip existing files by default', async () => {
     const outputDir = getTmpDir('existing')
     const sourceFile = joinPath(fixturesPath, 'mead.svg')
