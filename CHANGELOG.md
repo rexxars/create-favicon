@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/rexxars/create-favicon/compare/v2.0.0...v2.1.0) (2023-04-18)
+
+### Features
+
+- use consistent filenames (icon => favicon) ([f911176](https://github.com/rexxars/create-favicon/commit/f911176c552c3f0636052e774c4a53ca880756f0))
+
 ## [2.0.0](https://github.com/rexxars/create-favicon/compare/v1.1.0...v2.0.0) (2023-04-18)
 
 ### ⚠ BREAKING CHANGES
