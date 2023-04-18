@@ -1,6 +1,6 @@
 # create-favicon
 
-[![npm version](https://img.shields.io/npm/v/eventsource-parser.svg?style=flat-square)](https://www.npmjs.com/package/eventsource-parser)
+[![npm version](https://img.shields.io/npm/v/create-favicon.svg?style=flat-square)](https://www.npmjs.com/package/create-favicon)
 
 Creates a minimal set of favicons that are compatible with most environments,
 based on [this article](https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs) by Evil Martians.
