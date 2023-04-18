@@ -22,22 +22,26 @@ Available as a CLI tool and as an API.
 ## CLI usage
 
 ```sh
-## Run straight from npm
-npm create favicon <path-to-image>
-
-## Or use npx
-npx create-favicon <path-to-image>
-
-## Or install globally and run
+## Install globally and run
 npm install -g create-favicon
-create-favicon <path-to-image>
+create-favicon <path-to-image> [output-dir]
+
+## Run straight from npm (separate flags with --)
+npm create favicon <path-to-image> [output-dir]
+npm create favicon <path-to-image> [output-dir] -- --overwrite
+
+## Or use npx (separate flags with --)
+npx create-favicon <path-to-image> [output-dir]
+npx create-favicon <path-to-image> [output-dir] -- --no-warn
 ```
 
 ## CLI options
 
 ```
+<path-to-image>     Source image
+[output-dir]        Output directory (default: ./favicons)
+
 --overwrite         Overwrite existing files (default: false)
---output-dir <dir>  Output directory (default: <cwd>/favicons)
 --base-path <path>  Base path for printed HTML and web manifest (default: /)
 --no-warn           Disable warnings (default: false)
 -h, --help          Display this message
@@ -69,13 +73,13 @@ const {html} = await createFavicon({
 // If you want to overwrite existing files, pass the `overwrite` option:
 const {html} = await createFavicon({
   sourceFile: '/path/to/some/file.svg',
-  overwrite: true
+  overwrite: true,
 })
 
 // Warnings can be silenced by passing `false` to the `warn` option:
 const {html} = await createFavicon({
   sourceFile: '/path/to/some/file.svg',
-  warn: false
+  warn: false,
 })
 
 // The favicon generator can also take a URL as input:

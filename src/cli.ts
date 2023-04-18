@@ -7,17 +7,16 @@ import {createFavicon} from './favicon.js'
 const cli = cac('create-favicon')
 
 cli
-  .command('<source-file>', 'Generate favicons from a source image', {
+  .command('<source-file> [output-dir]', 'Generate favicons from a source image', {
     ignoreOptionDefaultValue: true,
   })
   .option('--overwrite', 'Overwrite existing files', {default: false})
-  .option('--output-dir <dir>', 'Output directory', {default: '<cwd>/favicons'})
   .option('--base-path <path>', 'Base path for printed HTML and web manifest', {default: '/'})
   .option('--no-warn', 'Disable warnings', {default: false})
   .example((name) => `${name} source.svg`)
   .example((name) => `${name} https://example.com/source.png --output-dir icons`)
-  .action(async (sourceFile, flags) => {
-    const {outputDir, basePath, warn, overwrite} = flags
+  .action(async (sourceFile, outputDir, flags) => {
+    const {basePath, warn, overwrite} = flags
     const options = {sourceFile, outputDir, basePath, warn, overwrite}
 
     try {

@@ -64,7 +64,7 @@ describe('cli', () => {
   test('should show help if no options are passed', () => {
     const result = createFavicon([], {cwd: getTmpDir()})
     expect(result.stdout).toMatch('Generate favicons from a source image')
-    expect(result.stdout).toContain('--output-dir <dir>')
+    expect(result.stdout).toContain('--base-path <path>')
     expect(result.status).toBe(1)
   })
 
@@ -119,7 +119,7 @@ describe('cli', () => {
     const outputDir = getTmpDir()
     const sourceFile = joinPath(fixturesPath, 'nonSquare.svg')
 
-    const result = createFavicon([sourceFile, '--output-dir', outputDir])
+    const result = createFavicon([sourceFile, outputDir])
     expect(result.status).toBe(0)
 
     expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
@@ -152,7 +152,7 @@ describe('cli', () => {
   test('should generate all variations from valid SVG', async () => {
     const outputDir = getTmpDir('valid')
     const sourceFile = joinPath(fixturesPath, 'mead.svg')
-    const result = await createFavicon([sourceFile, '--output-dir', outputDir])
+    const result = await createFavicon([sourceFile, outputDir])
 
     expect(await hashFile(joinPath(outputDir, 'icon.svg'))).toBe(await hashFile(sourceFile))
 
@@ -228,7 +228,7 @@ describe('cli', () => {
       targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
     )
 
-    const result = await createFavicon([sourceFile, '--output-dir', outputDir])
+    const result = await createFavicon([sourceFile, outputDir])
 
     for (const target of targetFiles) {
       expect(await hashFile(joinPath(outputDir, target))).toBe(doNotReplaceHash)
@@ -258,7 +258,7 @@ describe('cli', () => {
       targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
     )
 
-    const result = await createFavicon([sourceFile, '--output-dir', outputDir, '--overwrite'])
+    const result = await createFavicon([sourceFile, outputDir, '--overwrite'])
 
     for (const target of targetFiles) {
       expect(await hashFile(joinPath(outputDir, target))).not.toBe(doNotReplaceHash)
@@ -269,7 +269,7 @@ describe('cli', () => {
   test('should generate all variations except SVG from PNG input, prints warning', async () => {
     const outputDir = getTmpDir('valid-png')
     const sourceFile = joinPath(fixturesPath, 'mead.png')
-    const result = await createFavicon([sourceFile, '--output-dir', outputDir])
+    const result = await createFavicon([sourceFile, outputDir])
 
     expect(result.stderr).toMatch(/Source image is not an SVG - skipping SVG output/i)
 
@@ -329,7 +329,6 @@ describe('cli', () => {
     const outputDir = getTmpDir('custom-basepath')
     const result = await createFavicon([
       joinPath(fixturesPath, 'mead.svg'),
-      '--output-dir',
       outputDir,
       '--base-path',
       '/foo/bar/',
