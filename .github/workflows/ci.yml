@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # for creating git tags and GitHub releases
-      id-token: write # for npm provenance and OIDC trusted publishing
+      id-token: write # for OIDC trusted publishing and npm provenance
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,4 +62,3 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
