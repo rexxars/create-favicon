@@ -2,98 +2,62 @@
   "name": "create-favicon",
   "version": "2.1.0",
   "description": "Create modern favicon variations from source image",
+  "keywords": [
+    "favicon",
+    "generate"
+  ],
+  "homepage": "https://github.com/rexxars/create-favicon#readme",
+  "bugs": {
+    "url": "https://github.com/rexxars/create-favicon/issues"
+  },
+  "license": "MIT",
+  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/rexxars/create-favicon.git"
+  },
+  "bin": {
+    "create-favicon": "./bin/create-favicon.js"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "source": "./src/index.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "source": "./src/index.ts",
-  "types": "./dist/index.d.ts",
-  "bin": {
-    "create-favicon": "./bin/create-favicon.cjs"
-  },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "pkg-utils build && pkg-utils --strict",
+    "build": "tsc --project tsconfig.dist.json",
     "prebuild": "npm run clean",
-    "lint": "eslint . && tsc --noEmit",
+    "format": "oxfmt --write .",
+    "lint": "oxfmt --check . && oxlint && tsc --noEmit",
     "test": "npm run test:api && npm run test:cli",
     "test:api": "vitest --reporter=verbose test/api.test.ts",
     "test:cli": "npm run build && vitest --reporter=verbose test/cli.test.ts",
     "posttest": "npm run lint",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "favicon",
-    "generate"
-  ],
-  "files": [
-    "dist",
-    "src"
-  ],
   "dependencies": {
-    "cac": "^6.7.14",
-    "sharp": "^0.32.0",
-    "undici": "^5.21.2"
+    "sharp": "^0.34.0"
   },
   "devDependencies": {
-    "@sanity/pkg-utils": "^2.2.14",
-    "@sanity/semantic-release-preset": "^4.1.1",
-    "@types/node": "^14.18.0",
-    "@typescript-eslint/eslint-plugin": "^5.56.0",
-    "@typescript-eslint/parser": "^5.56.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-config-sanity": "^5.1.0",
-    "prettier": "^2.8.6",
-    "rimraf": "^4.4.1",
-    "semantic-release": "^20.1.3",
-    "typescript": "^4.9.5",
-    "vitest": "^0.29.7"
+    "@sanity/semantic-release-preset": "^6.0.0",
+    "@types/node": "^22.0.0",
+    "oxfmt": "^0.45.0",
+    "oxlint": "^1.60.0",
+    "rimraf": "^6.1.3",
+    "semantic-release": "^25.0.3",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.4"
   },
-  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
-  "license": "MIT",
   "engines": {
-    "node": ">=14.18"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/rexxars/create-favicon.git"
-  },
-  "bugs": {
-    "url": "https://github.com/rexxars/create-favicon/issues"
-  },
-  "homepage": "https://github.com/rexxars/create-favicon#readme",
-  "prettier": {
-    "semi": false,
-    "printWidth": 100,
-    "bracketSpacing": false,
-    "singleQuote": true
-  },
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 9,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "modules": true
-      }
-    },
-    "extends": [
-      "sanity",
-      "sanity/typescript",
-      "prettier"
-    ],
-    "ignorePatterns": [
-      "lib/**/"
-    ]
+    "node": ">=22"
   }
 }

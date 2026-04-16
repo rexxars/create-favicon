@@ -1,54 +1,83 @@
 #!/usr/bin/env node
-/* eslint-disable no-process-exit, no-console */
-import cac from 'cac'
-import {version} from '../package.json'
+import {readFileSync} from 'node:fs'
+import {parseArgs} from 'node:util'
 import {createFavicon} from './favicon.js'
 
-const cli = cac('create-favicon')
+function getPackageVersion(): string {
+  const raw = readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+  const pkg: unknown = JSON.parse(raw)
+  if (
+    typeof pkg === 'object' &&
+    pkg !== null &&
+    'version' in pkg &&
+    typeof pkg.version === 'string'
+  ) {
+    return pkg.version
+  }
+  return 'unknown'
+}
 
-cli
-  .command('<source-file> [output-dir]', 'Generate favicons from a source image', {
-    ignoreOptionDefaultValue: true,
-  })
-  .option('--overwrite', 'Overwrite existing files', {default: false})
-  .option('--base-path <path>', 'Base path for printed HTML and web manifest', {default: '/'})
-  .option('--no-manifest', 'Skip outputting a webmanifest', {default: false})
-  .option('--no-warn', 'Disable warnings', {default: false})
-  .example((name) => `${name} source.svg`)
-  .example((name) => `${name} https://example.com/source.png --output-dir icons`)
-  .action(async (sourceFile, outputDir, flags) => {
-    const {basePath, warn, overwrite, manifest} = flags
-    const options = {sourceFile, outputDir, basePath, warn, overwrite, manifest}
+const version = getPackageVersion()
 
-    try {
-      const result = await createFavicon(options)
-      console.log(result.html)
-    } catch (err) {
-      console.error(err)
-      process.exit(1)
-    }
-  })
+const helpText = `create-favicon v${version}
 
-// Display help message when `-h` or `--help` appears
-cli.help()
+Usage:
+  create-favicon <source-file> [output-dir]
 
-// Display version number when `-v` or `--version` appears
-// It's also used in help message
-cli.version(version)
+Generate favicons from a source image
 
-// Trigger parsing and execute commands
+Options:
+  --overwrite          Overwrite existing files
+  --base-path <path>   Base path for printed HTML and web manifest (default: /)
+  --no-manifest        Skip outputting a webmanifest
+  --no-warn            Disable warnings
+  -h, --help           Show this help message
+  -v, --version        Show version number
+
+Examples:
+  create-favicon source.svg
+  create-favicon https://example.com/source.png ./icons`
+
 try {
-  cli.parse()
-} catch (err: unknown) {
-  if (!(err instanceof Error)) {
-    throw new Error(`Unknown error: ${err}`)
+  const {values, positionals} = parseArgs({
+    allowPositionals: true,
+    options: {
+      overwrite: {type: 'boolean', default: false},
+      'base-path': {type: 'string', default: '/'},
+      'no-manifest': {type: 'boolean', default: false},
+      'no-warn': {type: 'boolean', default: false},
+      help: {type: 'boolean', short: 'h', default: false},
+      version: {type: 'boolean', short: 'v', default: false},
+    },
+  })
+
+  if (values.help) {
+    console.log(helpText)
+    process.exit(0)
   }
 
-  if (err.message.includes('missing required args')) {
-    cli.outputHelp()
+  if (values.version) {
+    console.log(version)
+    process.exit(0)
+  }
+
+  const [sourceFile, outputDir] = positionals
+  if (!sourceFile) {
+    console.log(helpText)
     process.exit(1)
   }
 
+  const result = await createFavicon({
+    sourceFile,
+    outputDir,
+    basePath: values['base-path'],
+    overwrite: values.overwrite,
+    warn: values['no-warn'] ? false : undefined,
+    manifest: values['no-manifest'] ? false : undefined,
+  })
+
+  console.log(result.html)
+} catch (err) {
   console.error(err)
   process.exit(1)
 }

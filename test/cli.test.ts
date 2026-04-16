@@ -4,18 +4,19 @@ import {join as joinPath} from 'node:path'
 import {tmpdir} from 'node:os'
 import {createHash} from 'node:crypto'
 import {type Server, createServer} from 'node:http'
-import {SpawnSyncOptions, SpawnSyncReturns, spawnSync} from 'node:child_process'
+import type {SpawnSyncOptions, SpawnSyncReturns} from 'node:child_process'
+import {spawnSync} from 'node:child_process'
 import {afterAll, beforeAll, describe, expect, test} from 'vitest'
 import sharp from 'sharp'
 
 let tmpDirNum = 0
 const testOutputDir = joinPath(tmpdir(), 'favicons-cli-output')
-const fixturesPath = joinPath(__dirname, 'fixtures')
-const cliPath = joinPath(__dirname, '..', 'bin', 'create-favicon.cjs')
+const fixturesPath = joinPath(import.meta.dirname, 'fixtures')
+const cliPath = joinPath(import.meta.dirname, '..', 'bin', 'create-favicon.js')
 
 function createFavicon(
   args: string[] = [],
-  options: SpawnSyncOptions = {}
+  options: SpawnSyncOptions = {},
 ): SpawnSyncReturns<string> {
   return spawnSync(cliPath, args, {...options, encoding: 'utf8'})
 }
@@ -157,10 +158,10 @@ describe('cli', () => {
     expect(await hashFile(joinPath(outputDir, 'favicon.svg'))).toBe(await hashFile(sourceFile))
 
     expect(result.stdout).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/manifest.webmanifest\\">
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+      <link rel="manifest" href="/manifest.webmanifest">
       "
     `)
 
@@ -215,9 +216,9 @@ describe('cli', () => {
     expect(existsSync(joinPath(outputDir, 'manifest.webmanifest'))).toBe(false)
 
     expect(result.stdout).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">
       "
     `)
   })
@@ -228,7 +229,7 @@ describe('cli', () => {
 
     // Place copies of _some_ file for all the below files, just to have something to
     // check whether or not gets overwritten later down
-    const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
+    const doNotReplaceFile = joinPath(import.meta.dirname, '..', 'README.md')
     const doNotReplaceHash = await hashFile(doNotReplaceFile)
     const targetFiles = [
       'favicon-512.png',
@@ -241,7 +242,7 @@ describe('cli', () => {
 
     await mkdir(outputDir, {recursive: true})
     await Promise.all(
-      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
+      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target))),
     )
 
     const result = await createFavicon([sourceFile, outputDir])
@@ -258,7 +259,7 @@ describe('cli', () => {
 
     // Place copies of _some_ file for all the below files, just to have something to
     // check whether or not gets overwritten later down
-    const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
+    const doNotReplaceFile = joinPath(import.meta.dirname, '..', 'README.md')
     const doNotReplaceHash = await hashFile(doNotReplaceFile)
     const targetFiles = [
       'favicon-512.png',
@@ -271,7 +272,7 @@ describe('cli', () => {
 
     await mkdir(outputDir, {recursive: true})
     await Promise.all(
-      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
+      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target))),
     )
 
     const result = await createFavicon([sourceFile, outputDir, '--overwrite'])
@@ -293,9 +294,9 @@ describe('cli', () => {
     expect(existsSync(joinPath(outputDir, 'favicon.svg'))).toBe(false)
 
     expect(result.stdout).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/manifest.webmanifest\\">
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+      <link rel="manifest" href="/manifest.webmanifest">
       "
     `)
 
@@ -351,10 +352,10 @@ describe('cli', () => {
     ])
 
     expect(result.stdout).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/foo/bar/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/foo/bar/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/foo/bar/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/foo/bar/manifest.webmanifest\\">
+      "<link rel="icon" href="/foo/bar/favicon.ico" sizes="any">
+      <link rel="icon" href="/foo/bar/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/foo/bar/apple-touch-icon.png">
+      <link rel="manifest" href="/foo/bar/manifest.webmanifest">
       "
     `)
 

@@ -6,11 +6,11 @@ import {createHash} from 'node:crypto'
 import {type Server, createServer} from 'node:http'
 import {afterAll, beforeAll, describe, expect, test, vi} from 'vitest'
 import sharp from 'sharp'
-import {createFavicon} from '../src'
+import {createFavicon} from '../src/index.js'
 
 let tmpDirNum = 0
 const testOutputDir = joinPath(tmpdir(), 'favicons-api-output')
-const fixturesPath = joinPath(__dirname, 'fixtures')
+const fixturesPath = joinPath(import.meta.dirname, 'fixtures')
 
 function getTmpDir(stub = ''): string {
   return joinPath(testOutputDir, `favicon-${stub ? `${stub}-` : ''}${++tmpDirNum}`)
@@ -55,64 +55,64 @@ describe('api', () => {
   test('should throw an error if no options are specified', async () => {
     // @ts-expect-error -- We're testing the error case
     await expect(() => createFavicon()).rejects.toMatchInlineSnapshot(
-      '[Error: No options specified]'
+      '[Error: No options specified]',
     )
   })
 
   test('should throw an error if no source file is specified', async () => {
     // @ts-expect-error -- We're testing the error case
     await expect(() => createFavicon({outputDir: getTmpDir()})).rejects.toMatchInlineSnapshot(
-      '[Error: No source file specified]'
+      '[Error: No source file specified]',
     )
   })
 
   test('should throw an error if the source file is not a string, Buffer, or URL (number input)', async () => {
     await expect(() =>
       // @ts-expect-error -- We're testing the error case
-      createFavicon({sourceFile: 123, outputDir: getTmpDir()})
+      createFavicon({sourceFile: 123, outputDir: getTmpDir()}),
     ).rejects.toMatchInlineSnapshot(
-      '[Error: Source file must be a string (file path or URL) or a Buffer]'
+      '[Error: Source file must be a string (file path or URL) or a Buffer]',
     )
   })
 
   test('should throw an error if the source file is not a string, Buffer, or URL (object input)', async () => {
     await expect(() =>
       // @ts-expect-error -- We're testing the error case
-      createFavicon({sourceFile: {foo: 'bar'}, outputDir: getTmpDir()})
+      createFavicon({sourceFile: {foo: 'bar'}, outputDir: getTmpDir()}),
     ).rejects.toMatchInlineSnapshot(
-      '[Error: Source file must be a string (file path or URL) or a Buffer]'
+      '[Error: Source file must be a string (file path or URL) or a Buffer]',
     )
   })
 
   test('should throw if file path does not exist', async () => {
     await expect(() =>
-      createFavicon({sourceFile: 'does-not-exist.png', outputDir: getTmpDir()})
+      createFavicon({sourceFile: 'does-not-exist.png', outputDir: getTmpDir()}),
     ).rejects.toThrow(/does-not-exist\.png": ENOENT/)
   })
 
   test('should throw if url does not return HTTP 200', async () => {
     await expect(() =>
-      createFavicon({sourceFile: 'http://localhost:27344', outputDir: getTmpDir()})
+      createFavicon({sourceFile: 'http://localhost:27344', outputDir: getTmpDir()}),
     ).rejects.toThrow(
-      'Failed fetching image from "http://localhost:27344": Server returned HTTP 404'
+      'Failed fetching image from "http://localhost:27344": Server returned HTTP 404',
     )
   })
 
   test('should throw if file could not be parsed as image (non-image format)', async () => {
     await expect(() =>
-      createFavicon({sourceFile: joinPath(fixturesPath, 'nonImage.svg'), outputDir: getTmpDir()})
+      createFavicon({sourceFile: joinPath(fixturesPath, 'nonImage.svg'), outputDir: getTmpDir()}),
     ).rejects.toThrow(/input buffer contains unsupported image format/i)
   })
 
   test('should throw if file could not be parsed as image (empty buffer)', async () => {
     await expect(() =>
-      createFavicon({sourceFile: Buffer.from(''), outputDir: getTmpDir()})
+      createFavicon({sourceFile: Buffer.from(''), outputDir: getTmpDir()}),
     ).rejects.toThrow(/input buffer is empty/i)
   })
 
   test('should throw on too small images', async () => {
     await expect(() =>
-      createFavicon({sourceFile: joinPath(fixturesPath, 'tooSmall.png'), outputDir: getTmpDir()})
+      createFavicon({sourceFile: joinPath(fixturesPath, 'tooSmall.png'), outputDir: getTmpDir()}),
     ).rejects.toThrow(/source image must be at least 512x512 pixels/i)
   })
 
@@ -123,7 +123,7 @@ describe('api', () => {
       outputDir: getTmpDir(),
     })
     expect(spy).toHaveBeenCalledWith(
-      '\u001b[93m[warn]\u001b[39m Source image is not square - it is HIGHLY recommended that input image is square'
+      '\u001b[93m[warn]\u001b[39m Source image is not square - it is HIGHLY recommended that input image is square',
     )
     spy.mockRestore()
   })
@@ -136,7 +136,7 @@ describe('api', () => {
       warn,
     })
     expect(warn).toHaveBeenCalledWith(
-      'Source image is not square - it is HIGHLY recommended that input image is square'
+      'Source image is not square - it is HIGHLY recommended that input image is square',
     )
   })
 
@@ -198,10 +198,10 @@ describe('api', () => {
     expect(await hashFile(joinPath(outputDir, 'favicon.svg'))).toBe(await hashFile(sourceFile))
 
     expect(result.html).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/manifest.webmanifest\\">"
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+      <link rel="manifest" href="/manifest.webmanifest">"
     `)
 
     expect(await sharp(joinPath(outputDir, 'apple-touch-icon.png')).metadata()).toMatchObject({
@@ -259,9 +259,9 @@ describe('api', () => {
     expect(existsSync(joinPath(outputDir, 'manifest.webmanifest'))).toBe(false)
 
     expect(result.html).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">"
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">"
     `)
   })
 
@@ -272,7 +272,7 @@ describe('api', () => {
 
     // Place copies of _some_ file for all the below files, just to have something to
     // check whether or not gets overwritten later down
-    const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
+    const doNotReplaceFile = joinPath(import.meta.dirname, '..', 'README.md')
     const doNotReplaceHash = await hashFile(doNotReplaceFile)
     const targetFiles = [
       'favicon-512.png',
@@ -285,7 +285,7 @@ describe('api', () => {
 
     await mkdir(outputDir, {recursive: true})
     await Promise.all(
-      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
+      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target))),
     )
 
     await createFavicon({
@@ -307,7 +307,7 @@ describe('api', () => {
 
     // Place copies of _some_ file for all the below files, just to have something to
     // check whether or not gets overwritten later down
-    const doNotReplaceFile = joinPath(__dirname, '..', 'README.md')
+    const doNotReplaceFile = joinPath(import.meta.dirname, '..', 'README.md')
     const doNotReplaceHash = await hashFile(doNotReplaceFile)
     const targetFiles = [
       'favicon-512.png',
@@ -320,7 +320,7 @@ describe('api', () => {
 
     await mkdir(outputDir, {recursive: true})
     await Promise.all(
-      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target)))
+      targetFiles.map((target) => copyFile(doNotReplaceFile, joinPath(outputDir, target))),
     )
 
     await createFavicon({
@@ -347,10 +347,10 @@ describe('api', () => {
     expect(await hashFile(joinPath(outputDir, 'favicon.svg'))).toBe(await hashFile(sourceFile))
 
     expect(result.html).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/manifest.webmanifest\\">"
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+      <link rel="manifest" href="/manifest.webmanifest">"
     `)
 
     expect(await sharp(joinPath(outputDir, 'apple-touch-icon.png')).metadata()).toMatchObject({
@@ -411,9 +411,9 @@ describe('api', () => {
     expect(existsSync(joinPath(outputDir, 'favicon.svg'))).toBe(false)
 
     expect(result.html).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/manifest.webmanifest\\">"
+      "<link rel="icon" href="/favicon.ico" sizes="any">
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+      <link rel="manifest" href="/manifest.webmanifest">"
     `)
 
     expect(await sharp(joinPath(outputDir, 'apple-touch-icon.png')).metadata()).toMatchObject({
@@ -467,10 +467,10 @@ describe('api', () => {
     })
 
     expect(result.html).toMatchInlineSnapshot(`
-      "<link rel=\\"icon\\" href=\\"/foo/bar/favicon.ico\\" sizes=\\"any\\">
-      <link rel=\\"icon\\" href=\\"/foo/bar/favicon.svg\\" type=\\"image/svg+xml\\">
-      <link rel=\\"apple-touch-icon\\" href=\\"/foo/bar/apple-touch-icon.png\\">
-      <link rel=\\"manifest\\" href=\\"/foo/bar/manifest.webmanifest\\">"
+      "<link rel="icon" href="/foo/bar/favicon.ico" sizes="any">
+      <link rel="icon" href="/foo/bar/favicon.svg" type="image/svg+xml">
+      <link rel="apple-touch-icon" href="/foo/bar/apple-touch-icon.png">
+      <link rel="manifest" href="/foo/bar/manifest.webmanifest">"
     `)
 
     expect(JSON.parse(await readFile(joinPath(outputDir, 'manifest.webmanifest'), 'utf8')))

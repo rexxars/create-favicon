@@ -1,7 +1,6 @@
 import {join as joinPath, resolve as resolvePath} from 'node:path'
 import {mkdir, stat, readFile, writeFile} from 'node:fs/promises'
 import sharp from 'sharp'
-import {request} from 'undici'
 import {sharpToIco} from './ico.js'
 import {generateWebManifest} from './webmanifest.js'
 import type {FaviconOptions, FaviconResult} from './types.js'
@@ -70,7 +69,7 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
   if (width !== height) {
     printWarning(
       'Source image is not square - it is HIGHLY recommended that input image is square',
-      warn
+      warn,
     )
     const size = Math.max(width, height, 512)
     base.resize(size, size, {fit: 'contain', background: 'transparent'})
@@ -94,26 +93,26 @@ export async function createFavicon(options: FaviconOptions): Promise<FaviconRes
 
   // 512x512 and 192x192 for Android devices
   await maybeWriteFile('favicon-512.png', (path) =>
-    base.clone().resize(512, 512).png().toFile(path)
+    base.clone().resize(512, 512).png().toFile(path),
   )
   await maybeWriteFile('favicon-192.png', (path) =>
-    base.clone().resize(192, 192).png().toFile(path)
+    base.clone().resize(192, 192).png().toFile(path),
   )
 
   // 180x180 for iOS devices
   await maybeWriteFile('apple-touch-icon.png', (path) =>
-    base.clone().resize(180, 180).png().toFile(path)
+    base.clone().resize(180, 180).png().toFile(path),
   )
 
   // 32x32 favicon for older browsers
   await maybeWriteFile('favicon.ico', async (path) =>
-    writeFile(path, await sharpToIco(base.clone()))
+    writeFile(path, await sharpToIco(base.clone())),
   )
 
   // Web manifest file pointing to the generated files
   if (manifest) {
     await maybeWriteFile('manifest.webmanifest', (path) =>
-      writeFile(path, generateWebManifest(basePath))
+      writeFile(path, generateWebManifest(basePath)),
     )
   }
 
@@ -163,21 +162,16 @@ function generateHtml(options: {basePath: string; hasSvg: boolean; manifest: boo
  * @internal
  */
 async function downloadImage(url: string): Promise<Buffer> {
-  const {statusCode, body} = await request(url, {reset: true}).catch((err: unknown) => {
+  const response = await fetch(url).catch((err: unknown) => {
     const message = err instanceof Error ? err.message : `${err}`
     throw new Error(`Failed fetching image from "${url}": ${message}`)
   })
 
-  if (statusCode !== 200) {
-    throw new Error(`Failed fetching image from "${url}": Server returned HTTP ${statusCode}`)
+  if (!response.ok) {
+    throw new Error(`Failed fetching image from "${url}": Server returned HTTP ${response.status}`)
   }
 
-  const buffers: Buffer[] = []
-  for await (const chunk of body) {
-    buffers.push(chunk)
-  }
-
-  return Buffer.concat(buffers)
+  return Buffer.from(await response.arrayBuffer())
 }
 
 /**
