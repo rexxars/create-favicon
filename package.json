@@ -48,6 +48,7 @@
     "sharp": "^0.34.0"
   },
   "devDependencies": {
+    "@semantic-release/git": "^10.0.1",
     "@types/node": "^22.0.0",
     "conventional-changelog-conventionalcommits": "^9.0.0",
     "oxfmt": "^0.45.0",
