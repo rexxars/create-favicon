@@ -4,5 +4,5 @@
   "printWidth": 100,
   "bracketSpacing": false,
   "singleQuote": true,
-  "ignorePatterns": ["dist"]
+  "ignorePatterns": ["dist", ".releaserc.json"]
 }
