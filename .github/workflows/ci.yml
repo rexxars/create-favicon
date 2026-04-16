@@ -27,10 +27,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm test
@@ -40,16 +40,20 @@ jobs:
     # only run if opt-in during workflow_dispatch
     if: always() && github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # for creating git tags and GitHub releases
+      id-token: write # for npm provenance and OIDC trusted publishing
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Need to fetch entire commit history to
           # analyze every commit since last release
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 22
           cache: npm
+          registry-url: https://registry.npmjs.org
       - run: npm ci
         # Branches that will release new versions are defined in .releaserc.json
       - run: npx semantic-release
@@ -58,4 +62,4 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
