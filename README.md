@@ -5,6 +5,8 @@
 Creates a minimal set of favicons that are compatible with most environments,
 based on [this article](https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs) by Evil Martians.
 
+Requires Node.js 22 or later.
+
 Source image must be at least 512x512, preferably a square SVG.
 
 The generated files are:
